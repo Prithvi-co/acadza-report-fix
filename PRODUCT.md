@@ -1,5 +1,3 @@
-> DRAFT - prepared by Prithvi's AI assistant as a working prototype. Prithvi reviews and adopts (or edits) before submission; first-person voice is his once approved.
-
 # PRODUCT.md
 
 ## Who loses the most when a question is broken
