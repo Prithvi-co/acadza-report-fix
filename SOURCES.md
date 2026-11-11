@@ -1,6 +1,6 @@
 # SOURCES.md - external grounding for the content verdicts
 
-Numeric verdicts: recomputed independently in `pipeline/verify_checks.py` (28 checks,
+Numeric verdicts: recomputed independently in `pipeline/verify_checks.py` (29 checks,
 all passing) - physics/math claims need no external source beyond the calculation.
 
 Biology / factual verdicts:
