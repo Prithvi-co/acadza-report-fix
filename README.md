@@ -3,6 +3,12 @@
 AI triage of student error reports on JEE/NEET questions, plus a faculty review
 console. Built for the Acadza AI Intern build round.
 
+Provenance: prepared by Prithvi's AI assistant as a working prototype that
+Prithvi approved for publication; he reviews and adopts (or edits) its content, and
+`PRODUCT.md` / `PROMPTS.md` carry the full draft/provenance disclosure. Triage
+judgments are precomputed offline (no live LLM calls); the API path is implemented
+but untested (no credits); a complete verbatim development log is not available.
+
 ## Layout
 
 - `pipeline/` - the triage engine
@@ -21,15 +27,15 @@ console. Built for the Acadza AI Intern build round.
 
 The raw assignment dataset (`data/`) is NOT committed: the brief asks for code +
 `results.json`, not redistribution of the raw dataset. The console reads a generated
-`console/data.json` (also gitignored); regenerate it locally with:
+`console/data.json`. That bundle IS committed here because the brief expressly asks
+for a live public console displaying the supplied questions; to regenerate it from
+the assignment dataset:
 
 ```
 python pipeline/build_console_data.py --data /path/to/assignment/data --results results.json
 ```
 
-The brief expressly asks for a live public console displaying the supplied questions,
-so a deployment serves that generated bundle; only the raw dataset files stay out of
-the repo.
+Only the raw dataset files stay out of the repo.
 - `bonus.md` - defects found that nobody reported
 - `PRODUCT.md`, `PROMPTS.md`
 
