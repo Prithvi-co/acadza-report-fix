@@ -1,5 +1,3 @@
-> DRAFT - assistant-prepared prototype, not submitted. The first-person voice is adopted only if Prithvi reviews and approves these words; remove this banner only after his actual approval.
-
 # PROMPTS.md
 
 ## Prompts inside the product
