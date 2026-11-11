@@ -1,0 +1,65 @@
+<!DOCTYPE html><html><body>
+<iframe id="f" src="index.html" style="width:1300px;height:800px"></iframe>
+<pre id="out">RUNNING</pre>
+<script>
+const out=[];
+function log(name,ok,info){out.push((ok?'PASS':'FAIL')+' '+name+(info?' - '+info:''))}
+const f=document.getElementById('f');
+let tries=0;
+f.onload=()=>{const t=setInterval(()=>{tries++;if(f.contentWindow.document.querySelectorAll('.case').length>0||tries>40){clearInterval(t);run()}},200)};
+function run(){
+ try{
+  const w=f.contentWindow, d=w.document;
+  localStorage.clear();
+  const cases=w.document.querySelectorAll('.case');
+  log('queue rendered', cases.length===39, 'cases='+cases.length);
+  // header label
+  log('header shows of-43', d.querySelector('#stats').textContent.includes('of 43'));
+  // 1. approve LCR case (first card, answer_key auto-eligible)
+  cases[0].click();
+  setTimeout(()=>{
+   const approve=d.querySelector('#bApprove');
+   log('approve label apply', approve.textContent.includes('sandbox'));
+   approve.click();
+   setTimeout(()=>{
+    const patch=JSON.parse(localStorage.getItem('acadza_patch_60f744b3f1b9bc7cc7b4a949')||'null');
+    log('patch stored', patch&&patch.field==='answer'&&patch.replace==='A');
+    log('patched badge', !!d.querySelector('.patched-badge'));
+    const keyMeta=d.querySelector('.meta').textContent;
+    log('key now shows A', /key:\s*"A"/.test(keyMeta), keyMeta.slice(0,80));
+    const aud=JSON.parse(localStorage.getItem('acadza_audit_R001')||'[]');
+    log('audit approved', aud.length===1&&aud[0].action.includes('approved'));
+    // revert via view original
+    d.querySelector('#bOrig').click();
+    setTimeout(()=>{
+     log('reverted', localStorage.getItem('acadza_patch_60f744b3f1b9bc7cc7b4a949')===null && /key:\s*"C"/.test(d.querySelector('.meta').textContent));
+     // 2. no-change case: find R029 (Newton's law, mu) - search
+     const search=d.querySelector('#search');
+     search.value='solved twice'; search.dispatchEvent(new w.Event('input',{bubbles:true}));
+     setTimeout(()=>{
+      const c=d.querySelector('.case'); c.click();
+      setTimeout(()=>{
+       log('no-change close label', d.querySelector('#bApprove').textContent.includes('Close case'));
+       log('no edit proposed', d.querySelector('#detail').textContent.includes('No edit proposed'));
+       log('no edit-then-approve button', !d.querySelector('#bEdit'));
+       // 3. trap case R027
+       search.value='admin bot'; search.dispatchEvent(new w.Event('input',{bubbles:true}));
+       setTimeout(()=>{
+        d.querySelector('.case').click();
+        setTimeout(()=>{
+         const t=d.querySelector('#detail').textContent;
+         log('trap not_actionable', t.includes('not_actionable'));
+         log('trap no apply', !t.includes('Approve - apply'));
+         log('trap mentions injection', t.includes('prompt injection'));
+         document.getElementById('out').textContent=out.join('\n');
+         document.title='TESTS DONE';
+        },300);
+       },300);
+      },300);
+     },300);
+    },300);
+   },300);
+  },300);
+ }catch(e){document.getElementById('out').textContent=out.join('\n')+'\nERROR '+e.message}
+}
+</script></body></html>

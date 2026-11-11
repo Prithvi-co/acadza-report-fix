@@ -1,0 +1,68 @@
+<!DOCTYPE html><html><body>
+<iframe id="f" src="index.html" style="width:1300px;height:800px"></iframe>
+<pre id="out">RUNNING</pre>
+<script>
+const out=[];
+function log(name,ok,info){out.push((ok?'PASS':'FAIL')+' '+name+(info?' - '+info:''))}
+const f=document.getElementById('f');
+let tries=0;
+f.onload=()=>{const t=setInterval(()=>{tries++;if(f.contentWindow.document.querySelectorAll('.case').length>0||tries>40){clearInterval(t);run()}},200)};
+function run(){
+ try{
+  const w=f.contentWindow, d=w.document;
+  // persistence pre-check: tests run AFTER test.html scenario in same browser profile?
+  // Here: fresh localStorage for this origin is shared with index - clear first for determinism
+  localStorage.clear();
+  // 1. edit-then-approve on spelling case (search 'plexus')
+  const search=d.querySelector('#search');
+  search.value='plexus wrong'; search.dispatchEvent(new w.Event('input',{bubbles:true}));
+  setTimeout(()=>{
+   d.querySelector('.case').click();
+   setTimeout(()=>{
+    d.querySelector('#bEdit').click();
+    const ta=d.querySelector('#editNote');
+    ta.value='Choroid plexus (edited by faculty)';
+    d.querySelector('#bSave').click();
+    setTimeout(()=>{
+     const p=JSON.parse(localStorage.getItem('acadza_patch_61ee6c9d90a1a968a168686b')||'null');
+     log('edited patch stored', p&&p.replace.includes('edited by faculty'));
+     const aud=JSON.parse(localStorage.getItem('acadza_audit_R022')||'[]');
+     log('edit audit', aud.length===1&&aud[0].action.includes('edited'));
+     // 2. reject on another case (search 'galat')
+     search.value='galat'; search.dispatchEvent(new w.Event('input',{bubbles:true}));
+     setTimeout(()=>{
+      d.querySelector('.case').click();
+      setTimeout(()=>{
+       w.prompt=()=>'not convinced by evidence';
+       d.querySelector('#bReject').click();
+       setTimeout(()=>{
+        const ra=JSON.parse(localStorage.getItem('acadza_audit_R004')||'[]');
+        log('reject audit with reason', ra.length===1&&ra[0].action==='rejected'&&ra[0].note==='not convinced by evidence');
+        log('reject chip in queue', d.querySelector('.case').textContent.includes('rejected'));
+        // 3. persistence: reload iframe, verify badge+audit survive
+        f.onload=()=>{const t2=setInterval(()=>{if(f.contentWindow.document.querySelectorAll('.case').length>0){clearInterval(t2);setTimeout(persistCheck,300)}},200)};
+        f.src=f.src;
+        function persistCheck(){
+         const d2=f.contentWindow.document;
+         log('patch survives reload', localStorage.getItem('acadza_patch_61ee6c9d90a1a968a168686b')!==null);
+         const s=d2.querySelector('#search');
+         s.value='plexus wrong'; s.dispatchEvent(new f.contentWindow.Event('input',{bubbles:true}));
+         setTimeout(()=>{
+          d2.querySelector('.case').click();
+          setTimeout(()=>{
+           log('badge survives reload', !!d2.querySelector('.patched-badge'));
+           log('audit rendered after reload', d2.querySelector('#detail').textContent.includes('approved (edited)'));
+           log('stats actioned count', d2.querySelector('#stats').textContent.match(/\d+ actioned/)[0]);
+           document.getElementById('out').textContent=out.join('\n');
+          },300);
+         },300);
+        }
+       },300);
+      },300);
+     },300);
+    },300);
+   },300);
+  },300);
+ }catch(e){document.getElementById('out').textContent=out.join('\n')+'\nERROR '+e.message}
+}
+</script></body></html>

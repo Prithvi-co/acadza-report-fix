@@ -1,0 +1,4 @@
+# Raw assignment dataset: the brief asks for code + results.json, not raw dataset
+# redistribution, so data/ is not committed.
+data/
+__pycache__/

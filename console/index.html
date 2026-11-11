@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Acadza - Report Review Console</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="brand">Acadza <span>report review</span></div>
+  <div id="stats"></div>
+</header>
+<div class="notice">Precomputed triage proposals (offline run - no live LLM credits). Nothing is applied to any live system here: approving applies the edit to a sandbox copy in this browser only, with a local audit entry.</div>
+<main>
+  <aside id="queue">
+    <div class="queue-controls">
+      <input id="search" type="search" placeholder="Search chapter, comment, id...">
+      <div id="filters">
+        <button data-f="all" class="on">All</button>
+        <button data-f="review">Needs review</button>
+        <button data-f="auto">Auto-eligible</button>
+        <button data-f="defect">Defects</button>
+      </div>
+    </div>
+    <div id="cases"></div>
+  </aside>
+  <section id="detail"><div class="empty">Pick a case on the left.</div></section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
